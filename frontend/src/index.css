@@ -1,0 +1,130 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+li {
+  list-style: none;
+}
+
+input[type="range"] {
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+
+  border: 0;
+  outline: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  margin-top: calc(
+    -1.5rem / 3
+  ); /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+}
+
+input[type="range"]::-moz-range-thumb {
+  border: 0;
+  outline: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* All the same stuff for IE */
+input[type="range"]::-ms-thumb {
+  border: 0;
+  outline: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+input[type="range"]:focus {
+  outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+input[type="range"]::-ms-track {
+  width: 100%;
+  cursor: pointer;
+
+  /* Hides the slider so custom styles can be added */
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 0.5rem;
+  cursor: pointer;
+  background: #fff;
+  border-radius: 9999px;
+  border: 0;
+  box-shadow: 0;
+}
+
+input[type="range"]:focus::-webkit-slider-runnable-track {
+  background: #fff;
+}
+
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0;
+  background: #fff;
+  border-radius: 9999px;
+  border: 0;
+}
+
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: 0.5rem;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 16px 0;
+  color: transparent;
+}
+input[type="range"]::-ms-fill-lower {
+  background: #fff;
+  border: 0;
+  border-radius: 9999px;
+  box-shadow: 0;
+}
+input[type="range"]:focus::-ms-fill-lower {
+  background: #3071a9;
+}
+input[type="range"]::-ms-fill-upper {
+  background: #fff;
+  border: 0;
+  border-radius: 99999px;
+  box-shadow: 0;
+}
+input[type="range"]:focus::-ms-fill-upper {
+  background: #fff;
+}

@@ -1,0 +1,78 @@
+.song-view {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  gap: 10rem;
+  padding: 5rem 5rem;
+  color: #fff;
+}
+
+.song-column {
+  flex-direction: column;
+  z-index: 50;
+}
+
+.song-column {
+  flex-basis: 30%;
+}
+
+.lyrics-column {
+  flex-basis: 70%;
+}
+
+.song-column .song-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  min-height: 1.2em;
+}
+
+.song-column .artist {
+  font-size: 1.4rem;
+  min-height: 1.2em;
+}
+
+.audio-hidden {
+  display: none;
+}
+
+.lyrics-column {
+  overflow: hidden;
+  font-size: 2.6rem;
+  height: calc(2.6rem * 14);
+}
+
+.lyrics-column .lyrics {
+  --offset-top: 0;
+  transform: translateY(calc(-1 * var(--offset-top)));
+  transition: transform 0.3s ease;
+}
+
+.lyrics-column .lyrics .lyrics-line {
+  line-height: 2.6rem;
+  margin-bottom: 2.6rem;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.lyrics-column .lyrics .lyrics-line.is-current {
+  font-weight: bold;
+  opacity: 1;
+}
+
+.weight-slider {
+  width: 100%;
+}
+
+.weight-section {
+  margin-top: 1rem;
+}
+
+.weight-label {
+  font-size: 1.2rem;
+}
+
+.weight-slider {
+  padding: 0.5rem 0;
+}

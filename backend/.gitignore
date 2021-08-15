@@ -1,0 +1,9 @@
+node_modules
+spleeter
+pretrained_models
+output
+audio
+seperated
+tmp_image
+
+config.ts

@@ -1,0 +1,16 @@
+.seeker-root {
+  margin-top: 1rem;
+}
+
+.times {
+  display: flex;
+  justify-content: space-between;
+}
+
+.seeker {
+  overflow: visible;
+}
+
+.seeker circle {
+  transition: cx 0.8s linear;
+}

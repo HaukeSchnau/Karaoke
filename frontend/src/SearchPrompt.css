@@ -1,0 +1,87 @@
+.search-prompt-root {
+  max-width: 50rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 2rem 0;
+}
+
+.search-prompt-root h1 {
+  color: #fff;
+  font-size: 4rem;
+  padding-bottom: 2rem;
+}
+
+.search-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  flex-grow: 1;
+}
+
+input.search-bar {
+  padding: 1em 2em;
+  border: 0;
+  outline: 0;
+  font-family: Montserrat;
+  font-size: 1.5rem;
+  border-radius: 2rem;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.results-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  background-color: #fff;
+  border-radius: 2rem;
+  padding: 1em 2em;
+  padding-top: 7rem;
+  gap: 1rem;
+  max-height: 100%;
+  overflow: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.results-preview::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-song {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 1rem;
+}
+
+.preview-song:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.preview-song .title {
+  font-weight: bold;
+  margin-top: 0.5em;
+  text-align: center;
+}
+
+.preview-song .artist {
+  margin-top: 0.2em;
+  text-align: center;
+}
+
+.preview-song img {
+  width: 100%;
+  border-radius: 1rem;
+  box-shadow: 8px 8px 32px rgba(0, 0, 0, 0.16);
+}
