@@ -4,6 +4,7 @@ import "./Seeker.css";
 type SeekerProps = {
   position: number;
   duration: number;
+  onChangePosition: (pos: number) => void;
 };
 
 function formatTime(ms: number) {
@@ -13,13 +14,21 @@ function formatTime(ms: number) {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export default function Seeker({ position, duration }: SeekerProps) {
+export default function Seeker({
+  position,
+  duration,
+  onChangePosition,
+}: SeekerProps) {
   return (
     <div className="seeker-root">
-      <svg viewBox="0 0 1000 50" width="100%" className="seeker">
-        <rect x="0" width="1000" y="20" height="10" fill="#fff" rx="5" />
-        <circle cx={(position / duration) * 1000} cy="25" r={25} fill="#fff" />
-      </svg>
+      <input
+        type="range"
+        min="0"
+        max={duration}
+        onChange={(e) => onChangePosition(parseFloat(e.target.value))}
+        value={position}
+      />
+
       <div className="times">
         <div className="current">{formatTime(position)}</div>
         <div className="total">{formatTime(duration)}</div>

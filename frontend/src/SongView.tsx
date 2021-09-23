@@ -33,6 +33,7 @@ function SongView() {
   const [volume, setVolume] = useState(0.4);
 
   const currentTimeoutHandle = useRef(-1);
+  const tempTimeoutHandle = useRef(-1);
   const timeTrackingInterval = useRef(-1);
 
   function setTimeoutForNextLine(
@@ -41,7 +42,7 @@ function SongView() {
   ) {
     currentTimeoutHandle.current = setTimeout(
       () => {
-        setCurrentLine((currentLine) => currentLine + 1);
+        setCurrentLine(currentLineIndex + 1);
 
         setTimeoutForNextLine(lyrics, currentLineIndex + 1);
       },
@@ -102,12 +103,12 @@ function SongView() {
         if (vocalsRef.current == null || accompanimentRef.current == null)
           return;
 
-        console.log(
-          accompanimentRef.current.currentTime,
-          vocalsRef.current.currentTime,
-          (accompanimentRef.current.currentTime || 0) -
-            (vocalsRef.current.currentTime || 0)
-        );
+        // console.log(
+        //   accompanimentRef.current.currentTime,
+        //   vocalsRef.current.currentTime,
+        //   (accompanimentRef.current.currentTime || 0) -
+        //     (vocalsRef.current.currentTime || 0)
+        // );
         const seconds = accompanimentRef.current.currentTime || 0;
         setAudioPositionMS(seconds * 1000);
         // vocalsRef.current.currentTime = accompanimentRef.current.currentTime;
@@ -130,6 +131,7 @@ function SongView() {
       setAudioPositionMS(0);
 
       clearTimeout(currentTimeoutHandle.current);
+      clearInterval(tempTimeoutHandle.current);
       clearInterval(timeTrackingInterval.current);
     };
   }, []);
@@ -142,10 +144,35 @@ function SongView() {
     setVocalWeight(newVocalWeight);
     vocalsRef.current!.volume = newVocalWeight * volume;
   }
+
   function onChangeVolume(newVolume: number) {
     setVolume(newVolume);
     accompanimentRef.current!.volume = newVolume;
     vocalsRef.current!.volume = vocalWeight * newVolume;
+  }
+
+  function onChangePlaybackPos(newPos: number) {
+    clearTimeout(currentTimeoutHandle.current);
+    clearInterval(tempTimeoutHandle.current);
+
+    setAudioPositionMS(newPos);
+
+    vocalsRef.current!.currentTime = newPos / 1000;
+    accompanimentRef.current!.currentTime = newPos / 1000;
+
+    const newLyricIndex = lyrics.findIndex((line) => line.startTime >= newPos);
+    setCurrentLine(newLyricIndex);
+
+    const expectedOffsetByTimeout = lyrics[newLyricIndex - 1]
+      ? lyrics[newLyricIndex].startTime -
+        lyrics[newLyricIndex - 1].startTime -
+        10
+      : lyrics[newLyricIndex].startTime - 10;
+
+    tempTimeoutHandle.current = setTimeout(
+      () => setTimeoutForNextLine(lyrics, newLyricIndex),
+      lyrics[newLyricIndex].startTime - newPos - expectedOffsetByTimeout
+    );
   }
 
   return (
@@ -165,7 +192,11 @@ function SongView() {
         <div className="song-title">{song?.name}</div>
         <div className="artist">{song?.artists.join(", ")}</div>
 
-        <Seeker duration={song?.durationMs || 1} position={audioPositionMs} />
+          <Seeker
+            duration={song?.durationMs || 1}
+            position={audioPositionMs}
+            onChangePosition={onChangePlaybackPos}
+          />
 
         <div className="weight-section">
           <label className="weight-label">
