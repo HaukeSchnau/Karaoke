@@ -1,11 +1,21 @@
 .song-view {
+  /* height: 100%; */
+  width: 100%;
+  padding: 0 5rem;
+  color: #fff;
+  margin: auto;
+}
+
+.back-button {
+  margin-bottom: 1em;
+  height: 2.4rem;
+  cursor: pointer;
+}
+
+.song-row {
   display: flex;
   align-items: center;
-  height: 100%;
-  width: 100%;
   gap: 10rem;
-  padding: 5rem 5rem;
-  color: #fff;
 }
 
 .song-column {

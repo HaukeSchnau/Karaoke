@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import Seeker from "./Seeker";
 import SongIcon from "./SongIcon";
 import "./SongView.css";
@@ -17,6 +17,8 @@ type LyricLine = {
 
 function SongView() {
   const { id } = useParams<SongViewParams>();
+  const history = useHistory();
+
   const [song, setSong] = useState<Song>();
   const [isPlaying, setPlaying] = useState(false);
   const [lyrics, setLyrics] = useState<LyricLine[]>([]);
@@ -148,6 +150,13 @@ function SongView() {
 
   return (
     <div className="song-view">
+      <img
+        className="back-button"
+        role="button"
+        src="/img/arrow_back.svg"
+        onClick={(e) => history.goBack()}
+      />
+      <div className="song-row">
       <div className="song-column">
         <SongIcon
           isPlaying={isPlaying}
@@ -189,7 +198,9 @@ function SongView() {
       <div className="lyrics-column">
         <div
           className="lyrics"
-          style={{ "--offset-top": lyricsOffset + "px" } as React.CSSProperties}
+            style={
+              { "--offset-top": lyricsOffset + "px" } as React.CSSProperties
+            }
         >
           {lyrics.map((line, i) => (
             <div
@@ -207,6 +218,7 @@ function SongView() {
 
       <audio className="audio-hidden" ref={accompanimentRef} />
       <audio className="audio-hidden" ref={vocalsRef} />
+      </div>
     </div>
   );
 }
