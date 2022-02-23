@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
-import SearchPrompt from "./SearchPrompt";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import SongView from "./SongView";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import SearchPrompt from "./routes/SearchPrompt";
+import SongView from "./routes/SongView";
 
 function App() {
   return (

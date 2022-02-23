@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import Seeker from "./Seeker";
-import SongIcon from "./SongIcon";
+import Seeker from "../components/Seeker";
+import SongIcon from "../components/SongIcon";
+import { Song } from "../types";
 import "./SongView.css";
-import { Song } from "./types";
 
 type SongViewParams = {
   id: string;
@@ -184,13 +184,13 @@ function SongView() {
         onClick={(e) => history.goBack()}
       />
       <div className="song-row">
-      <div className="song-column">
-        <SongIcon
-          isPlaying={isPlaying}
-          imgUrl={song?.images?.sort((a, b) => b.width - a.width)[0]?.url}
-        />
-        <div className="song-title">{song?.name}</div>
-        <div className="artist">{song?.artists.join(", ")}</div>
+        <div className="song-column">
+          <SongIcon
+            isPlaying={isPlaying}
+            imgUrl={song?.images?.sort((a, b) => b.width - a.width)[0]?.url}
+          />
+          <div className="song-title">{song?.name}</div>
+          <div className="artist">{song?.artists.join(", ")}</div>
 
           <Seeker
             duration={song?.durationMs || 1}
@@ -198,57 +198,57 @@ function SongView() {
             onChangePosition={onChangePlaybackPos}
           />
 
-        <div className="weight-section">
-          <label className="weight-label">
-            Lautstärke des Original-Gesangs:
-            <input
-              type="range"
-              min="0"
-              max="100"
-              className="weight-slider"
-              onChange={(e) => onChangeWeight(parseInt(e.target.value) / 100)}
-              value={vocalWeight * 100}
-            />
-          </label>
+          <div className="weight-section">
+            <label className="weight-label">
+              Lautstärke des Original-Gesangs:
+              <input
+                type="range"
+                min="0"
+                max="100"
+                className="weight-slider"
+                onChange={(e) => onChangeWeight(parseInt(e.target.value) / 100)}
+                value={vocalWeight * 100}
+              />
+            </label>
+          </div>
+          <div className="weight-section">
+            <label className="weight-label">
+              Gesamt-Lautstärke:
+              <input
+                type="range"
+                min="0"
+                max="100"
+                className="weight-slider"
+                onChange={(e) => onChangeVolume(parseInt(e.target.value) / 100)}
+                value={volume * 100}
+              />
+            </label>
+          </div>
         </div>
-        <div className="weight-section">
-          <label className="weight-label">
-            Gesamt-Lautstärke:
-            <input
-              type="range"
-              min="0"
-              max="100"
-              className="weight-slider"
-              onChange={(e) => onChangeVolume(parseInt(e.target.value) / 100)}
-              value={volume * 100}
-            />
-          </label>
-        </div>
-      </div>
 
-      <div className="lyrics-column">
-        <div
-          className="lyrics"
+        <div className="lyrics-column">
+          <div
+            className="lyrics"
             style={
               { "--offset-top": lyricsOffset + "px" } as React.CSSProperties
             }
-        >
-          {lyrics.map((line, i) => (
-            <div
-              key={line.startTime}
-              className={classNames("lyrics-line", {
-                "is-current": i === currentLine,
-              })}
-              ref={i === currentLine ? currentLineElement : null}
-            >
-              {line.text}
-            </div>
-          ))}
+          >
+            {lyrics.map((line, i) => (
+              <div
+                key={line.startTime}
+                className={classNames("lyrics-line", {
+                  "is-current": i === currentLine,
+                })}
+                ref={i === currentLine ? currentLineElement : null}
+              >
+                {line.text}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <audio className="audio-hidden" ref={accompanimentRef} />
-      <audio className="audio-hidden" ref={vocalsRef} />
+        <audio className="audio-hidden" ref={accompanimentRef} />
+        <audio className="audio-hidden" ref={vocalsRef} />
       </div>
     </div>
   );

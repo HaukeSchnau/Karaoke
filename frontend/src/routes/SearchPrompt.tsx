@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { Song } from "../types";
 import "./SearchPrompt.css";
-import { Song } from "./types";
 
 function SearchPrompt() {
   const timeoutHandle = useRef(0);
