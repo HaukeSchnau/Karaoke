@@ -2,12 +2,12 @@ import React from "react";
 import "./SongIcon.css";
 import classNames from "classnames";
 
-type IconProps = {
+interface SongIconProps {
   imgUrl?: string;
   isPlaying?: boolean;
-};
+}
 
-export default function SongIcon({ imgUrl, isPlaying }: IconProps) {
+const SongIcon: React.FC<SongIconProps> = ({ imgUrl, isPlaying }) => {
   return (
     <div className="song-icon">
       <div className="song-sleeve"></div>
@@ -21,4 +21,6 @@ export default function SongIcon({ imgUrl, isPlaying }: IconProps) {
       />
     </div>
   );
-}
+};
+
+export default SongIcon;

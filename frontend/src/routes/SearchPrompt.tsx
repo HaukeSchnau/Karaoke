@@ -1,38 +1,18 @@
-import React, { useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { Song } from "../types";
+import React, { useState } from "react";
+import Suggestion from "../components/Suggestion";
+import { useDebounce } from "../hooks/useDebounce";
 import "./SearchPrompt.css";
 
-function SearchPrompt() {
-  const timeoutHandle = useRef(0);
+const SearchPrompt: React.FC = () => {
   const [results, setResults] = useState([]);
 
-  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (timeoutHandle.current) clearTimeout(timeoutHandle.current);
-
-    const handle = setTimeout(async () => {
-      const url = new URL("http://localhost:3000/api/search");
-      url.search = new URLSearchParams({ q: e.target.value }).toString();
-      const res = await fetch(url.toString()).then((res) => res.json());
-      console.log(res);
-      setResults(res);
-    }, 1000);
-    timeoutHandle.current = handle;
-  }
-
-  function renderItem(item: Song) {
-    const img = item.images.sort((a, b) => b.width - a.width)[0];
-
-    return (
-      <li className="preview-song">
-        <Link to={`/song/${item.id}`}>
-          <img src={img.url} />
-          <div className="title">{item.name}</div>
-          <div className="artist">{item.artists[0]}</div>
-        </Link>
-      </li>
-    );
-  }
+  const debounce = useDebounce(async (e) => {
+    const url = new URL("http://localhost:3000/api/search");
+    url.search = new URLSearchParams({ q: e.target.value }).toString();
+    const res = await fetch(url.toString()).then((res) => res.json());
+    console.log(res);
+    setResults(res);
+  });
 
   return (
     <div className="search-prompt-root">
@@ -41,15 +21,19 @@ function SearchPrompt() {
         <input
           className="search-bar"
           placeholder="Suche einen Song, Künstler oder Album..."
-          onChange={onChange}
+          onChange={debounce}
           autoFocus
         />
         {results && !!results.length && (
-          <ul className="results-preview">{results.map(renderItem)}</ul>
+          <ul className="results-preview">
+            {results.map((item) => (
+              <Suggestion song={item} />
+            ))}
+          </ul>
         )}
       </div>
     </div>
   );
-}
+};
 
 export default SearchPrompt;

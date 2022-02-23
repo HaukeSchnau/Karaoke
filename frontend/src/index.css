@@ -128,3 +128,7 @@ input[type="range"]::-ms-fill-upper {
 input[type="range"]:focus::-ms-fill-upper {
   background: #fff;
 }
+
+.hidden {
+  display: none;
+}

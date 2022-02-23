@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import SearchPrompt from "./routes/SearchPrompt";
 import SongView from "./routes/SongView";
 
-function App() {
+const App: React.FC = () => {
   return (
     <Router>
       <div className="root" id="app-root">
@@ -21,6 +21,6 @@ function App() {
       </div>
     </Router>
   );
-}
+};
 
 export default App;

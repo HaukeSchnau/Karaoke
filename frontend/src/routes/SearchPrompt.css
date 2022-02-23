@@ -55,33 +55,3 @@ input.search-bar {
 .results-preview::-webkit-scrollbar {
   display: none;
 }
-
-.preview-song {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 1rem;
-}
-
-.preview-song:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.preview-song .title {
-  font-weight: bold;
-  margin-top: 0.5em;
-  text-align: center;
-}
-
-.preview-song .artist {
-  margin-top: 0.2em;
-  text-align: center;
-}
-
-.preview-song img {
-  width: 100%;
-  border-radius: 1rem;
-  box-shadow: 8px 8px 32px rgba(0, 0, 0, 0.16);
-}

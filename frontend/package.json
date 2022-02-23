@@ -9,6 +9,8 @@
   "dependencies": {
     "classnames": "^2.3.1",
     "fast-average-color": "^6.4.1",
+    "mobx": "^6.4.1",
+    "mobx-react-lite": "^3.3.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-router-dom": "^5.2.0"

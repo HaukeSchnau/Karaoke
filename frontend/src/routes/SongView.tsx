@@ -1,58 +1,28 @@
-import classNames from "classnames";
+import { observer } from "mobx-react-lite";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import LyricsView from "../components/LyricsView";
 import Seeker from "../components/Seeker";
+import Slider from "../components/Slider";
 import SongIcon from "../components/SongIcon";
-import { Song } from "../types";
+import NowPlaying from "../store/NowPlaying";
+import { LyricLine, Song } from "../types";
 import "./SongView.css";
 
-type SongViewParams = {
+interface SongViewParams {
   id: string;
-};
+}
 
-type LyricLine = {
-  text: string;
-  startTime: number;
-};
-
-function SongView() {
+const SongView: React.FC = () => {
   const { id } = useParams<SongViewParams>();
   const history = useHistory();
 
-  const [song, setSong] = useState<Song>();
-  const [isPlaying, setPlaying] = useState(false);
-  const [lyrics, setLyrics] = useState<LyricLine[]>([]);
+  const [nowPlaying, setNowPlaying] = useState<NowPlaying | null>(null);
+
   const accompanimentRef = useRef<HTMLAudioElement>(null);
   const vocalsRef = useRef<HTMLAudioElement>(null);
-  const currentLineElement = useRef<HTMLDivElement>(null);
-  const [currentLine, setCurrentLine] = useState(-1);
-  const [lyricsOffset, setLyricsOffset] = useState(0);
-  const [audioPositionMs, setAudioPositionMS] = useState(0);
 
-  const [vocalWeight, setVocalWeight] = useState(0.75);
-  const [volume, setVolume] = useState(0.4);
-
-  const currentTimeoutHandle = useRef(-1);
-  const tempTimeoutHandle = useRef(-1);
   const timeTrackingInterval = useRef(-1);
-
-  function setTimeoutForNextLine(
-    lyrics: LyricLine[],
-    currentLineIndex: number
-  ) {
-    currentTimeoutHandle.current = setTimeout(
-      () => {
-        setCurrentLine(currentLineIndex + 1);
-
-        setTimeoutForNextLine(lyrics, currentLineIndex + 1);
-      },
-      lyrics[currentLineIndex]
-        ? lyrics[currentLineIndex + 1].startTime -
-            lyrics[currentLineIndex].startTime -
-            10
-        : lyrics[currentLineIndex + 1].startTime - 10
-    );
-  }
 
   useEffect(() => {
     (async () => {
@@ -70,7 +40,6 @@ function SongView() {
           "Content-Type": "application/json",
         },
       }).then((res) => res.json());
-      setSong(song);
 
       const accompaniment = await fetch(
         "http://localhost:3000/api/audio/" + fileName + "/accompaniment"
@@ -91,10 +60,9 @@ function SongView() {
           song.id
         }`
       ).then((res) => res.json())) as LyricLine[];
-      console.log(newLyrics);
-      setLyrics(newLyrics);
 
-      setTimeoutForNextLine(newLyrics, -1);
+      const newNowPlaying = new NowPlaying(song, newLyrics);
+      setNowPlaying(newNowPlaying);
 
       accompanimentRef.current?.play();
       vocalsRef.current?.play();
@@ -103,76 +71,47 @@ function SongView() {
         if (vocalsRef.current == null || accompanimentRef.current == null)
           return;
 
-        // console.log(
-        //   accompanimentRef.current.currentTime,
-        //   vocalsRef.current.currentTime,
-        //   (accompanimentRef.current.currentTime || 0) -
-        //     (vocalsRef.current.currentTime || 0)
-        // );
         const seconds = accompanimentRef.current.currentTime || 0;
-        setAudioPositionMS(seconds * 1000);
-        // vocalsRef.current.currentTime = accompanimentRef.current.currentTime;
-      }, 1000);
+        newNowPlaying.audioPosition = seconds * 1000;
+      }, 100);
 
-      vocalsRef.current!.volume = vocalWeight * volume;
-      accompanimentRef.current!.volume = volume;
+      vocalsRef.current!.volume = newNowPlaying.vocalVolume;
+      accompanimentRef.current!.volume = newNowPlaying.volume;
 
       console.log(accompaniment);
 
-      setPlaying(true);
+      newNowPlaying.isPlaying = true;
     })();
 
     return () => {
-      setSong(undefined);
-      setPlaying(false);
-      setLyrics([]);
-      setCurrentLine(-1);
-      setLyricsOffset(0);
-      setAudioPositionMS(0);
+      setNowPlaying(null);
 
-      clearTimeout(currentTimeoutHandle.current);
-      clearInterval(tempTimeoutHandle.current);
       clearInterval(timeTrackingInterval.current);
     };
   }, []);
 
-  useEffect(() => {
-    setLyricsOffset(currentLineElement.current?.offsetTop || 0);
-  }, [currentLine]);
-
   function onChangeWeight(newVocalWeight: number) {
-    setVocalWeight(newVocalWeight);
-    vocalsRef.current!.volume = newVocalWeight * volume;
+    if (nowPlaying) {
+      nowPlaying.vocalWeight = newVocalWeight;
+      vocalsRef.current!.volume = nowPlaying.vocalVolume;
+    }
   }
 
   function onChangeVolume(newVolume: number) {
-    setVolume(newVolume);
-    accompanimentRef.current!.volume = newVolume;
-    vocalsRef.current!.volume = vocalWeight * newVolume;
+    if (nowPlaying) {
+      nowPlaying.volume = newVolume;
+      accompanimentRef.current!.volume = nowPlaying.volume;
+      vocalsRef.current!.volume = nowPlaying.vocalVolume;
+    }
   }
 
   function onChangePlaybackPos(newPos: number) {
-    clearTimeout(currentTimeoutHandle.current);
-    clearInterval(tempTimeoutHandle.current);
-
-    setAudioPositionMS(newPos);
+    if (nowPlaying) {
+      nowPlaying.audioPosition = newPos;
+    }
 
     vocalsRef.current!.currentTime = newPos / 1000;
     accompanimentRef.current!.currentTime = newPos / 1000;
-
-    const newLyricIndex = lyrics.findIndex((line) => line.startTime >= newPos);
-    setCurrentLine(newLyricIndex);
-
-    const expectedOffsetByTimeout = lyrics[newLyricIndex - 1]
-      ? lyrics[newLyricIndex].startTime -
-        lyrics[newLyricIndex - 1].startTime -
-        10
-      : lyrics[newLyricIndex].startTime - 10;
-
-    tempTimeoutHandle.current = setTimeout(
-      () => setTimeoutForNextLine(lyrics, newLyricIndex),
-      lyrics[newLyricIndex].startTime - newPos - expectedOffsetByTimeout
-    );
   }
 
   return (
@@ -181,77 +120,47 @@ function SongView() {
         className="back-button"
         role="button"
         src="/img/arrow_back.svg"
-        onClick={(e) => history.goBack()}
+        onClick={() => history.goBack()}
       />
       <div className="song-row">
         <div className="song-column">
           <SongIcon
-            isPlaying={isPlaying}
-            imgUrl={song?.images?.sort((a, b) => b.width - a.width)[0]?.url}
+            isPlaying={nowPlaying?.isPlaying}
+            imgUrl={
+              nowPlaying?.song.images?.sort((a, b) => b.width - a.width)[0]?.url
+            }
           />
-          <div className="song-title">{song?.name}</div>
-          <div className="artist">{song?.artists.join(", ")}</div>
+          <div className="song-title">{nowPlaying?.song.name}</div>
+          <div className="artist">{nowPlaying?.song.artists.join(", ")}</div>
 
           <Seeker
-            duration={song?.durationMs || 1}
-            position={audioPositionMs}
+            duration={nowPlaying?.song.durationMs || 1}
+            position={nowPlaying?.audioPosition ?? 0}
             onChangePosition={onChangePlaybackPos}
           />
 
-          <div className="weight-section">
-            <label className="weight-label">
-              Lautstärke des Original-Gesangs:
-              <input
-                type="range"
-                min="0"
-                max="100"
-                className="weight-slider"
-                onChange={(e) => onChangeWeight(parseInt(e.target.value) / 100)}
-                value={vocalWeight * 100}
-              />
-            </label>
-          </div>
-          <div className="weight-section">
-            <label className="weight-label">
-              Gesamt-Lautstärke:
-              <input
-                type="range"
-                min="0"
-                max="100"
-                className="weight-slider"
-                onChange={(e) => onChangeVolume(parseInt(e.target.value) / 100)}
-                value={volume * 100}
-              />
-            </label>
-          </div>
+          <Slider
+            label="Lautstärke des Original-Gesangs:"
+            value={nowPlaying?.vocalWeight ?? 0}
+            onChange={onChangeWeight}
+          />
+
+          <Slider
+            label="Gesamt-Lautstärke:"
+            value={nowPlaying?.volume ?? 0}
+            onChange={onChangeVolume}
+          />
         </div>
 
         <div className="lyrics-column">
-          <div
-            className="lyrics"
-            style={
-              { "--offset-top": lyricsOffset + "px" } as React.CSSProperties
-            }
-          >
-            {lyrics.map((line, i) => (
-              <div
-                key={line.startTime}
-                className={classNames("lyrics-line", {
-                  "is-current": i === currentLine,
-                })}
-                ref={i === currentLine ? currentLineElement : null}
-              >
-                {line.text}
-              </div>
-            ))}
-          </div>
+          {nowPlaying && <LyricsView nowPlaying={nowPlaying} />}
         </div>
 
-        <audio className="audio-hidden" ref={accompanimentRef} />
-        <audio className="audio-hidden" ref={vocalsRef} />
+        <audio className="hidden" ref={accompanimentRef} />
+        <audio className="hidden" ref={vocalsRef} />
       </div>
     </div>
   );
-}
+};
 
-export default SongView;
+export default observer(SongView);

@@ -13,3 +13,8 @@ export type Song = {
   id: string;
   durationMs: number;
 };
+
+export type LyricLine = {
+  text: string;
+  startTime: number;
+};

@@ -1,0 +1,17 @@
+.lyrics {
+  --offset-top: 0;
+  transform: translateY(calc(-1 * var(--offset-top)));
+  transition: transform 0.3s ease;
+}
+
+.lyrics .lyrics-line {
+  line-height: 2.6rem;
+  margin-bottom: 2.6rem;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.lyrics .lyrics-line.is-current {
+  font-weight: bold;
+  opacity: 1;
+}

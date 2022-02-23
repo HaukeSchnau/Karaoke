@@ -1,24 +1,18 @@
 import React from "react";
+import { formatTime } from "../util/time";
 import "./Seeker.css";
 
-type SeekerProps = {
+interface SeekerProps {
   position: number;
   duration: number;
   onChangePosition: (pos: number) => void;
-};
-
-function formatTime(ms: number) {
-  const totalSeconds = ms / 1000;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.round(totalSeconds - minutes * 60);
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export default function Seeker({
+const Seeker: React.FC<SeekerProps> = ({
   position,
   duration,
   onChangePosition,
-}: SeekerProps) {
+}) => {
   return (
     <div className="seeker-root">
       <input
@@ -35,4 +29,6 @@ export default function Seeker({
       </div>
     </div>
   );
-}
+};
+
+export default Seeker;
