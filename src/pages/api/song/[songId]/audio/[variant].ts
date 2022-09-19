@@ -7,11 +7,20 @@ export default handler().get(async (req, res) => {
   const path = `./audio/separated/${fileName}/${variant}.wav`;
   const stat = await fs.stat(path);
 
-  res.writeHead(200, {
-    "Content-Type": "audio/wav",
-    "Content-Length": stat.size,
-  });
+  const range = req.headers.range ?? "bytes=0-";
+  const parts = range.replace(/bytes=/, "").split("-");
+  const start = parseInt(parts[0] ?? "0", 10);
+  const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+  const chunksize = end - start + 1;
 
-  const readStream = createReadStream(path);
-  readStream.pipe(res);
+  const file = createReadStream(path, { start, end });
+  const head = {
+    "Content-Range": `bytes ${start}-${end}/${stat.size}`,
+    "Accept-Ranges": "bytes",
+    "Content-Length": chunksize,
+    "Content-Type": "audio/wav",
+  };
+
+  res.writeHead(206, head);
+  file.pipe(res);
 });

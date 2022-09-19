@@ -9,9 +9,7 @@ const useAudio = (url?: string) => {
   useEffect(() => {
     (async () => {
       if (audioRef.current && url) {
-        const audioData = await fetch(url).then((res) => res.blob());
-        const audioDataUrl = URL.createObjectURL(audioData);
-        audioRef.current.src = audioDataUrl;
+        audioRef.current.src = url;
         audioRef.current.load();
         setIsLoaded(true);
       }
