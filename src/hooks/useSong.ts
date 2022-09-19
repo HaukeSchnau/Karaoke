@@ -21,7 +21,11 @@ const useAudio = (url?: string) => {
   return { audioRef, isLoaded };
 };
 
-export const useSong = (songId: string) => {
+export const useSong = (
+  songId: string,
+  options?: { hasInteracted: boolean }
+) => {
+  const { hasInteracted } = options ?? {};
   const timeTrackingInterval = useRef<NodeJS.Timer>();
   const preparation = trpc.proxy.prepare.useMutation();
   const nowPlaying = useSongData(songId);
@@ -40,11 +44,24 @@ export const useSong = (songId: string) => {
   );
 
   useEffect(() => {
-    if (isLoadedAccompaniment && isLoadedVocals) {
+    if (
+      nowPlaying &&
+      isLoadedAccompaniment &&
+      isLoadedVocals &&
+      hasInteracted
+    ) {
       accompanimentRef.current?.play();
       vocalRef.current?.play();
+      nowPlaying.isPlaying = true;
     }
-  }, [isLoadedAccompaniment, isLoadedVocals]);
+
+    return () => {
+      accompanimentRef.current?.pause();
+      vocalRef.current?.pause();
+      if (nowPlaying) nowPlaying.isPlaying = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadedAccompaniment, isLoadedVocals, hasInteracted, nowPlaying]);
 
   useEffect(() => {
     (async () => {
@@ -65,7 +82,6 @@ export const useSong = (songId: string) => {
 
       vocalRef.current.volume = nowPlaying.vocalVolume;
       accompanimentRef.current.volume = nowPlaying.volume;
-      nowPlaying.isPlaying = true;
     })();
 
     return () => {

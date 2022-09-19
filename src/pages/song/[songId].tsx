@@ -6,11 +6,13 @@ import { useSong } from "@src/hooks/useSong";
 import { observer } from "mobx-react-lite";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
-const SongView: React.FC = () => {
+const SongView: React.FC<{ hasInteracted: boolean }> = ({ hasInteracted }) => {
   const router = useRouter();
   const { nowPlaying, setWeight, setVolume, setPlaybackPos } = useSong(
-    router.query.songId as string
+    router.query.songId as string,
+    { hasInteracted }
   );
 
   return (
