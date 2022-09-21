@@ -53,7 +53,6 @@ export const appRouter = t.router({
       const { artist, title } = input;
       const fileName = buildFileName(artist, title);
       await downloadSong(artist, title, fileName);
-      await separate(fileName);
     }),
 });
 

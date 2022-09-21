@@ -4,6 +4,7 @@ import { useDebounce } from "@src/hooks/useDebounce";
 import { trpc } from "@src/utils/trpc";
 import Suggestion from "@src/components/Suggestion";
 import clsx from "clsx";
+import Loading from "@src/components/Loading";
 
 const Home: NextPage = () => {
   const [query, setQuery] = useState("");
@@ -47,15 +48,8 @@ const Home: NextPage = () => {
             )}
           >
             {isLoading && (
-              <div className="lds-roller mb-4">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+              <div className="mb-4">
+                <Loading />
               </div>
             )}
 

@@ -1,25 +1,43 @@
-import NowPlaying from "@src/store/NowPlaying";
+import Song from "@src/store/Song";
 import { trpc } from "@src/utils/trpc";
 import { useEffect, useState } from "react";
 
 export const useSongData = (songId: string) => {
-  const { data: song } = trpc.proxy.spotifySongData.useQuery({
+  const preparation = trpc.proxy.prepare.useMutation();
+  const { data: songData } = trpc.proxy.spotifySongData.useQuery({
     spotifyId: songId,
   });
   const { data: lyrics } = trpc.proxy.lyrics.useQuery(
-    song
+    songData
       ? {
-          ...song,
-          artist: song?.artists[0] ?? "",
-          title: song?.name ?? "",
+          ...songData,
+          artist: songData?.artists[0] ?? "",
+          title: songData?.name ?? "",
         }
       : undefined
   );
-  const [nowPlaying, setNowPlaying] = useState<NowPlaying | null>(null);
+  const [song, setSong] = useState<Song | null>(null);
   useEffect(() => {
-    if (song && lyrics) {
-      setNowPlaying(new NowPlaying(song, lyrics));
+    if (songData && lyrics) {
+      setSong(new Song(songData, lyrics));
     }
-  }, [lyrics, song]);
-  return nowPlaying;
+  }, [lyrics, songData]);
+
+  useEffect(() => {
+    (async () => {
+      if (!song) return;
+
+      const { songData } = song;
+
+      await preparation.mutateAsync({
+        title: songData.name,
+        artist: songData.artists[0] ?? "",
+      });
+
+      song.prepare();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!song]);
+
+  return song;
 };

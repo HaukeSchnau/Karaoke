@@ -1,4 +1,4 @@
-export type Song = {
+export type SongData = {
   album: string;
   artists: string[];
   images: Image[];

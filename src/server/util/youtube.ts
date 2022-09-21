@@ -7,6 +7,7 @@ import { pipeline } from "stream/promises";
 import { env } from "@src/env/server.mjs";
 import fsExtra from "fs-extra";
 import { buildFileName } from "@src/utils/buildFileName";
+import { checkIfStateModificationsAreAllowed } from "mobx/dist/internal";
 
 function checkFileExists(file: string) {
   return fs.promises
@@ -29,8 +30,29 @@ async function getSongData(artist: string, title: string) {
   );
 
   let songData;
-  let i = 0;
 
+  for (let i = 0; i < channels.length; i++) {
+    const channel = channels[i];
+    const res = await youtube.search.list({
+      auth: env.GOOGLE_API_KEY,
+      part: "snippet",
+      channelId: channel.snippet.channelId,
+      q: title,
+      type: "video",
+    });
+
+    const video = res.data.items.find(
+      (vid: any) =>
+        vid.snippet.title.toLowerCase().trim() === title.toLowerCase().trim()
+    );
+
+    if (video) {
+      songData = video;
+      break;
+    }
+  }
+
+  let i = 0;
   while (!songData) {
     const songRes = await youtube.search.list({
       auth: env.GOOGLE_API_KEY,
@@ -39,6 +61,7 @@ async function getSongData(artist: string, title: string) {
       type: "video",
       channelId: channels[i].snippet.channelId,
     });
+
     const songs = songRes.data.items;
     songData = songs[0];
     i++;
@@ -52,7 +75,7 @@ export async function downloadSong(
   title: string,
   filename: string
 ) {
-  const dir = "./audio/full";
+  const dir = "./cache/audio";
   await fsExtra.ensureDir(dir);
   const path = p.join(dir, filename);
 

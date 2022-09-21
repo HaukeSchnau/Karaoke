@@ -31,7 +31,7 @@
     "react-dom": "18.2.0",
     "spotify-web-api-node": "^5.0.2",
     "superjson": "^1.9.1",
-    "ytdl-core": "^4.11.1",
+    "ytdl-core": "^4.11.2",
     "zod": "^3.18.0"
   },
   "devDependencies": {
