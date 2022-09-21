@@ -11,6 +11,7 @@ export const serverSchema = z.object({
   GOOGLE_API_KEY: z.string(),
   SPOTIFY_CLIENT_ID: z.string(),
   SPOTIFY_CLIENT_SECRET: z.string(),
+  SPOTIFY_PLAYLIST_ID: z.string(),
   MUSIXMATCH_USER_TOKEN: z.string(),
 });
 

@@ -4,7 +4,6 @@ import { z } from "zod";
 import spotify from "@src/server/util/spotify";
 import { getSyncedLyrics } from "@src/server/util/lyrics";
 import { downloadSong } from "@src/server/util/youtube";
-import { separate } from "@src/server/util/spleeter";
 import { buildFileName } from "@src/utils/buildFileName";
 
 export const appRouter = t.router({
@@ -26,6 +25,9 @@ export const appRouter = t.router({
     .query(({ input }) => {
       return spotify.getSongById(input.spotifyId);
     }),
+  playlist: t.procedure.query(() => {
+    return spotify.getPlaylist();
+  }),
   lyrics: t.procedure
     .input(
       z

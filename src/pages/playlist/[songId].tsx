@@ -1,8 +1,10 @@
 import SongView from "@src/components/SongView";
-import { observer } from "mobx-react-lite";
+import type { NextPage } from "next";
 import { useRouter } from "next/router";
 
-const SongPage: React.FC<{ hasInteracted: boolean }> = ({ hasInteracted }) => {
+const PlaylistSongPage: NextPage<{ hasInteracted: boolean }> = ({
+  hasInteracted,
+}) => {
   const router = useRouter();
 
   return (
@@ -13,4 +15,4 @@ const SongPage: React.FC<{ hasInteracted: boolean }> = ({ hasInteracted }) => {
   );
 };
 
-export default observer(SongPage);
+export default PlaylistSongPage;

@@ -14,6 +14,8 @@ export default class AudioTrack {
 
   isDone = false;
 
+  isCancelled = false;
+
   constructor(
     private fileName: string,
     private variant: "accompaniment" | "vocals",
@@ -62,7 +64,7 @@ export default class AudioTrack {
     )
       .then((res) => res.json())
       .then((data: number[][]) => {
-        if (data.length === 0) {
+        if (data.length === 0 || this.isCancelled) {
           return;
         }
         const buffer = this.context.createBuffer(2, data.length, 48000);
@@ -87,6 +89,7 @@ export default class AudioTrack {
   }
 
   cleanUp() {
+    this.isCancelled = true;
     this.currentSource?.stop();
 
     if (this.currentSource) this.currentSource.disconnect();
