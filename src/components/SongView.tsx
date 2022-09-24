@@ -54,7 +54,6 @@ const SongView: React.FC<{
       </div>
     );
 
-  console.log(song.isReady, song.isPlaying);
   return (
     <div className="m-auto mt-4 flex h-full w-full flex-col px-20 text-white">
       <div className="mb-4 flex gap-4">
@@ -103,13 +102,15 @@ const SongView: React.FC<{
           )}
         </div>
 
-        {nextTracks && (
+        {nextTracks?.length ? (
           <div className="basis-2/6">
             <PlaylistPreview
               nextTracks={nextTracks}
               changeTrack={changeTrack}
             />
           </div>
+        ) : (
+          <></>
         )}
       </div>
     </div>

@@ -43,7 +43,6 @@ export default class AudioTrack {
 
     if (!source) return;
 
-    source.connect(this.gain);
     source.start();
 
     source.onended = () => {
@@ -73,6 +72,7 @@ export default class AudioTrack {
 
         const source = this.context.createBufferSource();
         source.buffer = buffer;
+        source.connect(this.gain);
 
         this.audioQueue.push(source);
 
