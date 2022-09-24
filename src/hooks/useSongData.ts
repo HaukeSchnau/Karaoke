@@ -17,9 +17,12 @@ export const useSongData = (songId: string) => {
       : undefined
   );
   const [song, setSong] = useState<Song | null>(null);
+
   useEffect(() => {
     if (songData && lyrics) {
       setSong(new Song(songData, lyrics));
+    } else {
+      setSong(null);
     }
   }, [lyrics, songData]);
 
@@ -36,8 +39,7 @@ export const useSongData = (songId: string) => {
 
       song.prepare();
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [!!song]);
+  }, [song]);
 
   return song;
 };

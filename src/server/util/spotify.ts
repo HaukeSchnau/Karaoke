@@ -2,48 +2,45 @@ import { env } from "@src/env/server.mjs";
 import { getImgUrl } from "@src/utils/spotify";
 import SpotifyWebApi from "spotify-web-api-node";
 
+const scopes = ["playlist-modify-public", "playlist-modify-private"];
+const state = "some-state-of-my-choice";
+
 const spotifyApi = new SpotifyWebApi({
   clientId: env.SPOTIFY_CLIENT_ID,
   clientSecret: env.SPOTIFY_CLIENT_SECRET,
+  redirectUri: "http://localhost:3000/api/login-callback",
 });
 
-async function getCredentials() {
-  await spotifyApi.clientCredentialsGrant().then(
-    function (data) {
-      console.log("The access token expires in " + data.body["expires_in"]);
-      console.log("The access token is " + data.body["access_token"]);
-
-      // Save the access token so that it's used in future calls
-      spotifyApi.setAccessToken(data.body["access_token"]);
-    },
-    function (err) {
-      console.log("Something went wrong when retrieving an access token", err);
-    }
-  );
+async function getAuthorizeUrl() {
+  const authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+  return authorizeURL;
 }
 
-export async function search(query: string) {
+async function getCredentials(code: string) {
+  return spotifyApi.authorizationCodeGrant(code);
+}
+
+export async function search(query: string, accessToken: string) {
   if (!query.trim().length) return [];
 
-  await getCredentials();
+  spotifyApi.setAccessToken(accessToken);
 
   const results = await spotifyApi.searchTracks(query);
   return results.body.tracks?.items.map(mapSong);
 }
 
-export const getPlaylist = async () => {
-  await getCredentials();
+export const getPlaylist = async (accessToken: string) => {
   const playlistId = env.SPOTIFY_PLAYLIST_ID;
 
+  spotifyApi.setAccessToken(accessToken);
   const res = await spotifyApi.getPlaylist(playlistId);
 
   return res.body;
 };
 
-export async function getSongById(id: string) {
-  await getCredentials();
-
+export async function getSongById(id: string, accessToken: string) {
   try {
+    spotifyApi.setAccessToken(accessToken);
     const results = await spotifyApi.getTrack(id);
     return mapSong(results.body);
   } catch (e: any) {
@@ -52,20 +49,32 @@ export async function getSongById(id: string) {
 }
 
 function mapSong(song: SpotifyApi.TrackObjectFull) {
+  const { name, id, artists, album, uri, duration_ms } = song;
   return {
-    name: song.name,
-    id: song.id,
-    album: song.album.name,
-    artists: song.artists.map((artist) => artist.name),
-    releaseDate: song.album.release_date,
-    durationMs: song.duration_ms,
-    images: song.album.images,
-    imgUrl: getImgUrl(song.album.images),
+    name: name,
+    id: id,
+    album: album.name,
+    artists: artists.map((artist) => artist.name),
+    releaseDate: album.release_date,
+    durationMs: duration_ms,
+    images: album.images,
+    imgUrl: getImgUrl(album.images),
+    uri: uri,
   };
+}
+
+async function removeTrack(uri: string, accessToken: string) {
+  spotifyApi.setAccessToken(accessToken);
+  return await spotifyApi.removeTracksFromPlaylist(env.SPOTIFY_PLAYLIST_ID, [
+    { uri },
+  ]);
 }
 
 export default {
   search,
   getSongById,
   getPlaylist,
+  removeTrack,
+  getAuthorizeUrl,
+  getCredentials,
 };

@@ -4,15 +4,21 @@ import Seeker from "@src/components/Seeker";
 import Slider from "@src/components/Slider";
 import SongIcon from "@src/components/SongIcon";
 import { useSongData } from "@src/hooks/useSongData";
+import { trpc } from "@src/utils/trpc";
 import { observer } from "mobx-react-lite";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
+import PlaylistPreview from "./PlaylistPreview";
 
-const SongView: React.FC<{ hasInteracted: boolean; songId: string }> = ({
-  hasInteracted,
-  songId,
-}) => {
+const SongView: React.FC<{
+  hasInteracted: boolean;
+  songId: string;
+  nextTracks?: SpotifyApi.PlaylistTrackObject[];
+}> = ({ hasInteracted, songId, nextTracks }) => {
   const song = useSongData(songId);
+  const remove = trpc.proxy.removeTrack.useMutation();
+  const router = useRouter();
 
   useEffect(() => {
     if (hasInteracted && song?.isReady) {
@@ -32,6 +38,15 @@ const SongView: React.FC<{ hasInteracted: boolean; songId: string }> = ({
     };
   }, [songId, !!song]);
 
+  const changeTrack = async (track: SpotifyApi.TrackObjectFull) => {
+    const uri = song?.songData.uri;
+    if (uri) {
+      // remove.mutateAsync({ uri: uri });
+    }
+
+    router.replace(`/playlist/${track.id}`);
+  };
+
   if (!song)
     return (
       <div className="grid h-full place-items-center">
@@ -39,15 +54,19 @@ const SongView: React.FC<{ hasInteracted: boolean; songId: string }> = ({
       </div>
     );
 
+  console.log(song.isReady, song.isPlaying);
   return (
     <div className="m-auto mt-4 flex h-full w-full flex-col px-20 text-white">
-      <Link href="/">
-        <a>
-          <img className="mb-4 h-10" src="/img/arrow_back.svg" alt="Back" />
-        </a>
-      </Link>
+      <div className="mb-4 flex gap-4">
+        <Link href="/">
+          <a className="btn">Suche</a>
+        </Link>
+        <Link href="/playlist">
+          <a className="btn">Playlist</a>
+        </Link>
+      </div>
       <div className="flex grow items-stretch gap-40">
-        <div className="basis-1/3">
+        <div className="basis-1/6">
           <SongIcon
             isPlaying={song?.isPlaying}
             imgUrl={song?.songData.imgUrl}
@@ -74,7 +93,7 @@ const SongView: React.FC<{ hasInteracted: boolean; songId: string }> = ({
           />
         </div>
 
-        <div className="h-full basis-2/3 overflow-hidden text-4xl">
+        <div className="h-full basis-3/6 overflow-hidden text-4xl">
           {song.isReady || song.isPlaying ? (
             <LyricsView song={song} />
           ) : (
@@ -83,6 +102,15 @@ const SongView: React.FC<{ hasInteracted: boolean; songId: string }> = ({
             </div>
           )}
         </div>
+
+        {nextTracks && (
+          <div className="basis-2/6">
+            <PlaylistPreview
+              nextTracks={nextTracks}
+              changeTrack={changeTrack}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,8 +13,10 @@ export const appRouter = t.router({
         query: z.string(),
       })
     )
-    .query(({ input }) => {
-      return spotify.search(input.query);
+    .query(({ input, ctx }) => {
+      const { accessToken } = ctx.req.cookies;
+      if (!accessToken) throw new Error("No accessToken found in cookies");
+      return spotify.search(input.query, accessToken);
     }),
   spotifySongData: t.procedure
     .input(
@@ -22,11 +24,15 @@ export const appRouter = t.router({
         spotifyId: z.string(),
       })
     )
-    .query(({ input }) => {
-      return spotify.getSongById(input.spotifyId);
+    .query(({ input, ctx }) => {
+      const { accessToken } = ctx.req.cookies;
+      if (!accessToken) throw new Error("No accessToken found in cookies");
+      return spotify.getSongById(input.spotifyId, accessToken);
     }),
-  playlist: t.procedure.query(() => {
-    return spotify.getPlaylist();
+  playlist: t.procedure.query(({ ctx }) => {
+    const { accessToken } = ctx.req.cookies;
+    if (!accessToken) throw new Error("No accessToken found in cookies");
+    return spotify.getPlaylist(accessToken);
   }),
   lyrics: t.procedure
     .input(
@@ -56,6 +62,25 @@ export const appRouter = t.router({
       const fileName = buildFileName(artist, title);
       await downloadSong(artist, title, fileName);
     }),
+  removeTrack: t.procedure
+    .input(
+      z.object({
+        uri: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { uri } = input;
+      const { accessToken } = ctx.req.cookies;
+      if (!accessToken) throw new Error("No accessToken found in cookies");
+      await spotify.removeTrack(uri, accessToken);
+    }),
+  authorizeUrl: t.procedure.query(({ ctx }) => {
+    const { accessToken } = ctx.req.cookies;
+
+    if (accessToken) return null;
+
+    return spotify.getAuthorizeUrl();
+  }),
 });
 
 // export type definition of API

@@ -17,15 +17,12 @@ const randomNumber = (min: number, max: number) => {
 };
 
 const Playlist: NextPage = () => {
+  const { data: authorizeUrl } = trpc.proxy.authorizeUrl.useQuery();
   const { data: playlist } = trpc.proxy.playlist.useQuery();
 
-  const getRandomTrack = () => {
+  const getNextTrack = () => {
     if (!playlist) return null;
-    const track =
-      playlist.tracks.items[
-        Math.floor(Math.random() * playlist.tracks.items.length)
-      ];
-    return track;
+    return playlist.tracks.items[0];
   };
 
   const tracks = useMemo(() => {
@@ -44,6 +41,16 @@ const Playlist: NextPage = () => {
       }) ?? []
     );
   }, [playlist]);
+
+  if (authorizeUrl) {
+    return (
+      <div className="grid h-full place-items-center">
+        <a href={authorizeUrl} className="btn">
+          Login
+        </a>
+      </div>
+    );
+  }
 
   if (!playlist)
     return (
@@ -70,9 +77,9 @@ const Playlist: NextPage = () => {
           }
         />
       ))}
-      <Link href={`/playlist/${getRandomTrack()?.track?.id}`}>
-        <a className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full bg-white py-8 px-16 text-4xl font-bold transition-all hover:scale-110 hover:shadow-2xl">
-          Spielen!
+      <Link href={`/playlist/${getNextTrack()?.track?.id}`}>
+        <a className="btn big absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
+          Los!
         </a>
       </Link>
     </div>

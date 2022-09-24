@@ -7,6 +7,7 @@ export type SongData = {
   id: string;
   durationMs: number;
   imgUrl?: string;
+  uri: string;
 };
 
 export type Image = {

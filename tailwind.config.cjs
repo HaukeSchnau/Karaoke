@@ -21,6 +21,8 @@ module.exports = {
     },
     colors: {
       white: "#fff",
+      black: "#222",
+      gray: "rgba(0, 0, 0, 0.6)",
       "overlay-black": "rgba(0,0,0,0.1)",
     },
   },
